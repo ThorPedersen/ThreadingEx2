@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 namespace FindSmallest
 {
@@ -12,6 +13,8 @@ namespace FindSmallest
             new[]{3,2,8,9,-1},
             new[]{1, 22,1,9,-3, 5}
         };
+
+       
 
         private static int FindSmallest(int[] numbers)
         {
@@ -31,12 +34,42 @@ namespace FindSmallest
             return smallestSoFar;
         }
 
+        public static void Loopingthreads()
+       {
+          //int i;
+          //foreach (int[] d in Data)
+          //{
+
+          //   Thread t1 = new Thread(() =>
+          //   {
+          //      int smallest = FindSmallest(d);
+          //      Console.WriteLine("Tråd " + i + ": " + String.Join(", ", d) + "\nMindste værdi -> " + smallest + "\t");
+          //   });
+
+          //   t1.Start();
+          //   i++;
+
+          //}
+       }
+
         static void Main()
         {
-            foreach (int[] data in Data)
+
+           //Loopingthreads();
+
+           int i = 1;
+            foreach (int[] d in Data)
             {
-                int smallest = FindSmallest(data);
-                Console.WriteLine("\t" + String.Join(", ", data) + "\n-> " + smallest);
+
+               Thread t1 = new Thread(() =>
+               {
+                  int smallest = FindSmallest(d);
+                  Console.WriteLine("Tråd " + i + ": " + String.Join(", ", d) + "\nMindste værdi -> " + smallest + "\t");
+               });
+
+               t1.Start();
+               i++;
+
             }
         }
     }
