@@ -1,12 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace FindSmallest
 {
-    class Program
-    {
+   class Program
+   {
 
-        private static readonly int[][] Data = new int[][]{
+      private static readonly int[][] Data = new int[][]{
             new[]{1,5,4,2}, 
             new[]{3,2,4,11,4},
             new[]{33,2,3,-1, 10},
@@ -14,63 +17,83 @@ namespace FindSmallest
             new[]{1, 22,1,9,-3, 5}
         };
 
-       
 
-        private static int FindSmallest(int[] numbers)
-        {
-            if (numbers.Length < 1)
+
+      private static int FindSmallest(int[] numbers)
+      {
+         if (numbers.Length < 1)
+         {
+            throw new ArgumentException("There must be at least one element in the array");
+         }
+
+         int smallestSoFar = numbers[0];
+         foreach (int number in numbers)
+         {
+            if (number < smallestSoFar)
             {
-                throw new ArgumentException("There must be at least one element in the array");
+               smallestSoFar = number;
             }
+         }
+         return smallestSoFar;
+      }
 
-            int smallestSoFar = numbers[0];
-            foreach (int number in numbers)
+      static void Main()
+      {
+         //Loopingthreads();
+
+         //int i = 1;
+         // foreach (int[] d in Data)
+         // {
+
+         //    Thread t1 = new Thread(() =>
+         //    {
+         //       int smallest = FindSmallest(d);
+         //       Console.WriteLine("Tråd " + i + ": " + String.Join(", ", d) + "\nMindste værdi -> " + smallest + "\t");
+         //       i++;
+         //    });
+
+         //    t1.Start();
+
+         // }
+         //int i = 1;
+         List<Task<int>> minAndenOpgs = new List<Task<int>>();
+
+         foreach (int[] d in Data)
+         {
+            Task<int> minAndenOpg = new Task<int>(() =>
             {
-                if (number < smallestSoFar)
-                {
-                    smallestSoFar = number;
-                }
-            }
-            return smallestSoFar;
-        }
+               int tempResult = FindSmallest(d);
+               Console.WriteLine(String.Join(", ", d) + "\nMindste værdi -> " + tempResult + "\t");
+               return tempResult;
+               
+            });
+            minAndenOpg.Start();
+            minAndenOpgs.Add(minAndenOpg);
+            //minAndenOpg.Start();
 
-        public static void Loopingthreads()
-       {
-          //int i;
-          //foreach (int[] d in Data)
-          //{
+            //Thread t = new Thread(() =>
+            //{          
+            //   int tempResult = FindSmallest(d);
+            //   Console.WriteLine(String.Join(", ", d) + "\nMindste værdi -> " + tempResult + "\t");
+            //});
 
-          //   Thread t1 = new Thread(() =>
-          //   {
-          //      int smallest = FindSmallest(d);
-          //      Console.WriteLine("Tråd " + i + ": " + String.Join(", ", d) + "\nMindste værdi -> " + smallest + "\t");
-          //   });
+            //t.Start();
+         }
 
-          //   t1.Start();
-          //   i++;
+         Task.WaitAll(minAndenOpgs.ToArray());
+         int smallest = minAndenOpgs[0].Result;
 
-          //}
-       }
-
-        static void Main()
-        {
-
-           //Loopingthreads();
-
-           int i = 1;
-            foreach (int[] d in Data)
+         foreach (Task<int> t in minAndenOpgs)
+         {
+            if (t.Result < smallest)
             {
-
-               Thread t1 = new Thread(() =>
-               {
-                  int smallest = FindSmallest(d);
-                  Console.WriteLine("Tråd " + i + ": " + String.Join(", ", d) + "\nMindste værdi -> " + smallest + "\t");
-               });
-
-               t1.Start();
-               i++;
-
+               smallest = t.Result;
             }
-        }
-    }
+            Console.WriteLine(smallest);
+         }
+
+         
+         //Console.Write(string.Join(";", mylist));
+      }
+   }
 }
